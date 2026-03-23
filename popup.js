@@ -12,7 +12,7 @@ const fetchRepoBtn = document.getElementById('fetch-repo');
 let tweaks = [];
 let snippets = [];
 
-const DEFAULT_REPO = 'varanus-salvator/page-tweaker';
+const DEFAULT_REPO = 'varanus-salvator/page-gremlin';
 
 // --- Tweaks (main panel) ---
 

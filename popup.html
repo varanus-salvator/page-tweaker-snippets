@@ -4,69 +4,80 @@
 <meta charset="utf-8">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { width: 420px; font: 13px/1.4 system-ui, sans-serif; padding: 12px; background: #1a1a2e; color: #e0e0e0; }
-  h1 { font-size: 15px; margin-bottom: 10px; color: #fff; display: flex; align-items: center; gap: 8px; }
-  h1 svg { width: 18px; height: 18px; }
+  body { width: 420px; font: 13px/1.4 system-ui, sans-serif; padding: 12px; background: #0d1a0d; color: #c0d8c0; }
+  h1 { font-size: 15px; margin-bottom: 10px; color: #4ade80; display: flex; align-items: center; gap: 8px; }
+  h1 svg { width: 20px; height: 20px; }
 
-  .tweak { background: #16213e; border: 1px solid #0f3460; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+  .tweak { background: #132613; border: 1px solid #1a6b35; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
   .tweak.disabled { opacity: 0.5; }
   .tweak-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
   .tweak-header input[type="text"] { flex: 1; }
   .tweak-header label { font-size: 11px; white-space: nowrap; cursor: pointer; }
 
   input[type="text"], textarea {
-    background: #0a0a1a; border: 1px solid #0f3460; color: #e0e0e0;
+    background: #091309; border: 1px solid #1a6b35; color: #c0d8c0;
     border-radius: 4px; padding: 5px 8px; font: 12px monospace; width: 100%;
   }
   textarea { min-height: 60px; resize: vertical; margin-top: 4px; }
-  input:focus, textarea:focus { outline: none; border-color: #e94560; }
+  input:focus, textarea:focus { outline: none; border-color: #4ade80; }
 
-  .label { font-size: 11px; color: #888; margin-top: 6px; }
+  .label { font-size: 11px; color: #5a7a5a; margin-top: 6px; }
   .actions { display: flex; gap: 6px; margin-top: 8px; }
   button {
-    background: #e94560; color: #fff; border: none; border-radius: 4px;
+    background: #2d8a4e; color: #fff; border: none; border-radius: 4px;
     padding: 5px 12px; cursor: pointer; font-size: 12px;
   }
-  button:hover { background: #c73652; }
-  button.secondary { background: #0f3460; }
-  button.secondary:hover { background: #1a4a7a; }
+  button:hover { background: #3aaa62; }
+  button.secondary { background: #1a3a1a; }
+  button.secondary:hover { background: #245a30; }
   button.danger { background: #533; }
   button.danger:hover { background: #744; }
 
   #add, #browse { width: 100%; margin-top: 4px; }
-  .empty { color: #666; text-align: center; padding: 20px 0; font-style: italic; }
+  .empty { color: #3a5a3a; text-align: center; padding: 20px 0; font-style: italic; }
 
   /* Snippet browser */
   #snippet-panel { display: none; }
   #snippet-panel.open { display: block; }
   .snippet-search { margin: 8px 0; }
-  .snippet { background: #16213e; border: 1px solid #0f3460; border-radius: 6px; padding: 10px; margin-bottom: 6px; }
-  .snippet-name { font-weight: bold; color: #fff; font-size: 13px; }
-  .snippet-domain { font-size: 11px; color: #e94560; }
-  .snippet-desc { font-size: 11px; color: #999; margin: 4px 0; }
+  .snippet { background: #132613; border: 1px solid #1a6b35; border-radius: 6px; padding: 10px; margin-bottom: 6px; }
+  .snippet-name { font-weight: bold; color: #4ade80; font-size: 13px; }
+  .snippet-domain { font-size: 11px; color: #2d8a4e; }
+  .snippet-desc { font-size: 11px; color: #6a8a6a; margin: 4px 0; }
   .snippet button { font-size: 11px; padding: 3px 10px; }
   .repo-input { display: flex; gap: 6px; margin-bottom: 8px; }
   .repo-input input { flex: 1; font: 12px monospace; }
   .repo-input button { white-space: nowrap; }
-  .back-link { font-size: 12px; color: #e94560; cursor: pointer; border: none; background: none; margin-bottom: 8px; }
+  .back-link { font-size: 12px; color: #4ade80; cursor: pointer; border: none; background: none; margin-bottom: 8px; }
   .back-link:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
   <h1>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+    <svg viewBox="0 0 48 48" width="20" height="20">
+      <path d="M8 18 L14 8 L18 16" fill="#2d8a4e"/>
+      <path d="M40 18 L34 8 L30 16" fill="#2d8a4e"/>
+      <ellipse cx="24" cy="26" rx="13" ry="12" fill="#2d8a4e"/>
+      <ellipse cx="18" cy="23" rx="3.5" ry="4" fill="#ffffcc"/>
+      <ellipse cx="30" cy="23" rx="3.5" ry="4" fill="#ffffcc"/>
+      <circle cx="19" cy="23" r="2" fill="#111"/>
+      <circle cx="31" cy="23" r="2" fill="#111"/>
+      <circle cx="19.7" cy="22" r="0.8" fill="#fff"/>
+      <circle cx="31.7" cy="22" r="0.8" fill="#fff"/>
+      <path d="M16 31 Q20 37 24 35 Q28 37 32 31" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round"/>
+      <rect x="19" y="31" width="2.5" height="3" rx="0.5" fill="#fff"/>
+      <rect x="26.5" y="31" width="2.5" height="3" rx="0.5" fill="#fff"/>
     </svg>
-    Page Tweaker
+    Page Gremlin
   </h1>
   <div id="main-panel">
     <div id="list"></div>
     <button id="add" class="secondary">+ Nieuw domein</button>
-    <button id="browse" class="secondary" style="margin-top:4px">&#128269; Snippet bibliotheek</button>
+    <button id="browse" class="secondary" style="margin-top:4px">Snippet bibliotheek</button>
   </div>
 
   <div id="snippet-panel">
-    <button class="back-link" id="back">&larr; Terug naar tweaks</button>
+    <button class="back-link" id="back">&larr; Terug</button>
     <h1>Snippet Bibliotheek</h1>
     <div class="repo-input">
       <input type="text" id="repo-url" placeholder="user/repo (GitHub)">

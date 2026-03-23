@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Page Tweaker",
+  "name": "Page Gremlin",
   "version": "1.0",
   "description": "Inject custom JS/CSS per URL pattern",
   "permissions": ["storage", "activeTab", "scripting"],
@@ -21,7 +21,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "page-tweaker@lumphini.org",
+      "id": "page-gremlin@lumphini.org",
       "strict_min_version": "128.0"
     }
   }

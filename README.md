@@ -1,4 +1,4 @@
-# Page Tweaker Snippets
+# Page Gremlin Snippets
 
 Browser extension to inject custom JavaScript and CSS per domain. Includes a community-maintained snippet library.
 
@@ -81,7 +81,7 @@ The reader view extracts everything from JSON-LD (title, author, date, body text
 | `tweaker.remove(...selectors)` | Remove all elements matching the selectors |
 | `tweaker.reveal(...selectors)` | Force-show hidden elements (sets display, visibility, opacity, overflow) |
 | `tweaker.insertHTML(html, target?)` | Insert HTML at the top of `target` (selector) or `<body>` |
-| `tweaker.log(...args)` | `console.log` with `[Page Tweaker]` prefix |
+| `tweaker.log(...args)` | `console.log` with `[Page Gremlin]` prefix |
 
 ```js
 // Remove cookie banners and overlays
@@ -129,6 +129,6 @@ Each snippet in `index.json`:
 - **One snippet per purpose** — don't bundle unrelated tweaks
 - **Use a clear `id`** — format: `domain-purpose`, e.g. `reddit-old-design`
 - **Use the `tweaker` API** — prefer `tweaker.remove()` over raw DOM calls
-- **Test your snippet** — make sure it works in the Page Tweaker extension
+- **Test your snippet** — make sure it works in the Page Gremlin extension
 - **Keep it minimal** — smallest possible JS/CSS to achieve the goal
 - **No malicious code** — no tracking, data exfiltration, or credential harvesting

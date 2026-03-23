@@ -1,5 +1,5 @@
 const BADGE_CSS = `
-#tweaker-badge {
+#gremlin-badge {
   position: fixed; bottom: 16px; right: 16px; z-index: 2147483647;
   width: 44px; height: 44px; border-radius: 50%;
   background: #fff; border: 2px solid #2d8a4e; color: #4ade80;
@@ -7,8 +7,8 @@ const BADGE_CSS = `
   cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   opacity: 0.7; transition: opacity 0.2s;
 }
-#tweaker-badge:hover { opacity: 1; transform: scale(1.1); }
-#tweaker-info {
+#gremlin-badge:hover { opacity: 1; transform: scale(1.1); }
+#gremlin-info {
   position: absolute; bottom: 52px; right: 0;
   background: #fff; border: 1px solid #2d8a4e; color: #1a3a1a;
   border-radius: 6px; padding: 8px 12px; font: 12px system-ui, sans-serif;
@@ -98,9 +98,9 @@ window.tweaker = {
     container.insertBefore(div, container.firstChild);
   },
 
-  // Open current page on archive.ph
-  archive() {
-    window.location.href = 'https://archive.ph/newest/' + encodeURI(window.location.href);
+  // Open archive.ph URL (called from badge, not directly)
+  archive(url) {
+    window.open(url, '_blank');
   },
 
   // Log to console with prefix
@@ -239,35 +239,67 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
           }
         }
 
-        // Show badge
-        chrome.scripting.executeScript({
-          target: { tabId },
-          func: (names) => {
-            if (document.getElementById('tweaker-badge')) return;
-            const badge = document.createElement('div');
-            badge.id = 'tweaker-badge';
-            badge.innerHTML = '<svg viewBox="0 0 48 48" width="30" height="30"><path d="M8 18 L14 8 L18 16" fill="#2d8a4e"/><path d="M40 18 L34 8 L30 16" fill="#2d8a4e"/><ellipse cx="24" cy="26" rx="13" ry="12" fill="#2d8a4e"/><ellipse cx="18" cy="23" rx="3.5" ry="4" fill="#ffffcc"/><ellipse cx="30" cy="23" rx="3.5" ry="4" fill="#ffffcc"/><circle cx="19" cy="23" r="2" fill="#111"/><circle cx="31" cy="23" r="2" fill="#111"/><circle cx="19.7" cy="22" r="0.8" fill="#fff"/><circle cx="31.7" cy="22" r="0.8" fill="#fff"/><path d="M16 31 Q20 37 24 35 Q28 37 32 31" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round"/><rect x="19" y="31" width="2.5" height="3" rx="0.5" fill="#fff"/><rect x="26.5" y="31" width="2.5" height="3" rx="0.5" fill="#fff"/></svg>';
-            badge.title = 'Page Gremlin actief:\\n' + names;
-            badge.addEventListener('click', () => {
-              const info = document.getElementById('tweaker-info');
-              if (info) { info.remove(); return; }
-              const panel = document.createElement('div');
-              panel.id = 'tweaker-info';
-              panel.innerHTML = '<div style="margin-bottom:6px;font-weight:bold;color:#2d8a4e">Page Gremlin</div>'
-                + '<div style="margin-bottom:8px">' + names + '</div>'
-                + '<a href="https://archive.ph/newest/' + encodeURI(location.href)
-                + '" style="color:#2d8a4e;text-decoration:underline;font-size:11px">archive.ph versie</a>';
-              badge.appendChild(panel);
-            });
-            document.body.appendChild(badge);
-          },
-          args: [names],
-          world: 'MAIN'
-        }).catch(() => {});
+        // Check archive.ph availability from background (no CORS issues)
+        checkArchive(tab.url).then(archiveUrl => {
+          // Show badge with archive info
+          chrome.scripting.executeScript({
+            target: { tabId },
+            func: (names, archiveUrl) => {
+              if (document.getElementById('gremlin-badge')) return;
+              const badge = document.createElement('div');
+              badge.id = 'gremlin-badge';
+              badge.innerHTML = '<svg viewBox="0 0 48 48" width="30" height="30"><path d="M8 18 L14 8 L18 16" fill="#2d8a4e"/><path d="M40 18 L34 8 L30 16" fill="#2d8a4e"/><ellipse cx="24" cy="26" rx="13" ry="12" fill="#2d8a4e"/><ellipse cx="18" cy="23" rx="3.5" ry="4" fill="#ffffcc"/><ellipse cx="30" cy="23" rx="3.5" ry="4" fill="#ffffcc"/><circle cx="19" cy="23" r="2" fill="#111"/><circle cx="31" cy="23" r="2" fill="#111"/><circle cx="19.7" cy="22" r="0.8" fill="#fff"/><circle cx="31.7" cy="22" r="0.8" fill="#fff"/><path d="M16 31 Q20 37 24 35 Q28 37 32 31" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round"/><rect x="19" y="31" width="2.5" height="3" rx="0.5" fill="#fff"/><rect x="26.5" y="31" width="2.5" height="3" rx="0.5" fill="#fff"/></svg>';
+              badge.title = 'Page Gremlin actief\\n' + names;
+              badge.addEventListener('click', () => {
+                const info = document.getElementById('gremlin-info');
+                if (info) { info.remove(); return; }
+                const panel = document.createElement('div');
+                panel.id = 'gremlin-info';
+                let html = '<div style="margin-bottom:6px;font-weight:bold;color:#2d8a4e">Page Gremlin</div>'
+                  + '<div style="margin-bottom:8px">' + names + '</div>';
+                if (archiveUrl) {
+                  html += '<a href="' + archiveUrl + '" target="_blank" style="color:#2d8a4e;text-decoration:underline;font-size:11px">Bekijk op archive.ph</a>';
+                }
+                panel.innerHTML = html;
+                badge.appendChild(panel);
+              });
+              document.body.appendChild(badge);
+            },
+            args: [names, archiveUrl],
+            world: 'MAIN'
+          }).catch(() => {});
+        });
       }).catch(() => {});
     });
   }
 });
+
+// Strip query params, hash, tracking junk from URL
+function cleanUrl(url) {
+  try {
+    const u = new URL(url);
+    return u.origin + u.pathname.replace(/\/+$/, '');
+  } catch {
+    return url;
+  }
+}
+
+// Check if archive.ph has this URL — follows redirect to get the actual archive link
+async function checkArchive(pageUrl) {
+  try {
+    const checkUrl = 'https://archive.ph/newest/' + cleanUrl(pageUrl);
+    const res = await fetch(checkUrl, { method: 'HEAD', redirect: 'follow' });
+    // archive.ph redirects to /TIMESTAMP/URL if it exists
+    // If no archive exists, it redirects to the submit page or returns the search
+    const finalUrl = res.url;
+    if (res.ok && finalUrl.match(/archive\.ph\/\d{14}\//)) {
+      return finalUrl;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 function matchDomain(url, domain) {
   try {

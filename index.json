@@ -32,19 +32,19 @@
     "css": "[data-temptation-position], .marketing-banner, .tm-ui, ._vis_hide_layer, [id^=\"_vis_opt\"], .tm, .tm--inline { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; pointer-events: none !important; } .paywall { display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; overflow: visible !important; max-height: none !important; } body { overflow: auto !important; }"
   },
   {
-    "id": "telegraaf-archive",
-    "name": "Telegraaf — archive.ph redirect",
+    "id": "telegraaf",
+    "name": "Telegraaf — archive.ph lookup",
     "domain": "telegraaf.nl",
-    "description": "Content zit niet in de HTML. Redirect automatisch naar archive.ph versie van het artikel.",
-    "js": "tweaker.archive();",
+    "description": "Content zit niet in de HTML. Gremlin badge toont link naar archive.ph als het artikel daar beschikbaar is.",
+    "js": "",
     "css": ""
   },
   {
-    "id": "nrc-archive",
-    "name": "NRC — archive.ph redirect",
+    "id": "nrc",
+    "name": "NRC — archive.ph lookup",
     "domain": "nrc.nl",
-    "description": "Redirect naar archive.ph versie van het artikel",
-    "js": "tweaker.archive();",
+    "description": "Gremlin badge toont link naar archive.ph als het artikel daar beschikbaar is.",
+    "js": "",
     "css": ""
   }
 ]

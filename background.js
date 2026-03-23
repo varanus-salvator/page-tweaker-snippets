@@ -275,11 +275,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
                 const voteYes = document.getElementById('gremlin-vote-yes');
                 const voteNo = document.getElementById('gremlin-vote-no');
                 if (voteYes) voteYes.addEventListener('click', () => {
-                  chrome.runtime.sendMessage({ type: 'archive-verdict', pageUrl: location.href, verdict: 'good' });
+                  chrome.runtime.sendMessage({ type: 'archive-verdict', snapshotKey: archiveData.key, verdict: 'good' });
                   panel.innerHTML = '<div style="color:#2d8a4e;font-size:12px">Thanks! Marked as complete.</div>';
                 });
                 if (voteNo) voteNo.addEventListener('click', () => {
-                  chrome.runtime.sendMessage({ type: 'archive-verdict', pageUrl: location.href, verdict: 'bad' });
+                  chrome.runtime.sendMessage({ type: 'archive-verdict', snapshotKey: archiveData.key, verdict: 'bad' });
                   panel.innerHTML = '<div style="color:#8a2d2d;font-size:12px">Thanks! This link won't be shown again.</div>';
                 });
               });
@@ -323,28 +323,38 @@ async function loadArchiveLists(repo) {
   } catch {}
 }
 
-// Check if archive.ph has this URL
+// Check archive.ph for this URL, try newest first, then oldest as fallback
 async function checkArchive(pageUrl) {
   try {
     const clean = cleanUrl(pageUrl);
 
-    // Load community lists
-    const { repoUrl } = await chrome.storage.local.get({ repoUrl: 'varanus-salvator/page-gremlin' });
+    // Load community + local lists
+    const { repoUrl, localBlocked = [], localVerified = [] } = await chrome.storage.local.get({
+      repoUrl: 'varanus-salvator/page-gremlin', localBlocked: [], localVerified: []
+    });
     await loadArchiveLists(repoUrl);
 
-    // Skip if community-blocked
-    if (archiveBlocklist.has(clean)) return null;
+    // Merge local verdicts into sets
+    localBlocked.forEach(u => archiveBlocklist.add(u));
+    localVerified.forEach(u => archiveVerified.add(u));
 
-    // Check if already verified
-    const isVerified = archiveVerified.has(clean);
+    // Try newest, then oldest — blocklist is per snapshot URL
+    for (const strategy of ['newest', 'oldest']) {
+      const checkUrl = `https://archive.ph/${strategy}/${clean}`;
+      const res = await fetch(checkUrl, { method: 'HEAD', redirect: 'follow' });
+      const finalUrl = res.url;
+      if (!res.ok || !finalUrl.match(/archive\.ph\/\d{14}\//)) continue;
 
-    const checkUrl = 'https://archive.ph/newest/' + clean;
-    const res = await fetch(checkUrl, { method: 'HEAD', redirect: 'follow' });
-    const finalUrl = res.url;
-    if (!res.ok || !finalUrl.match(/archive\.ph\/\d{14}\//)) {
-      return null;
+      // Extract the short ID (archive.ph/XXXXX)
+      const shortMatch = finalUrl.match(/archive\.ph\/(\d{14})\//);
+      const snapshotKey = shortMatch ? shortMatch[1] + '/' + clean : finalUrl;
+
+      if (archiveBlocklist.has(snapshotKey)) continue;
+      const isVerified = archiveVerified.has(snapshotKey);
+
+      return { url: finalUrl, verified: isVerified, key: snapshotKey };
     }
-    return { url: finalUrl, verified: isVerified };
+    return null;
   } catch {
     return null;
   }
@@ -353,21 +363,21 @@ async function checkArchive(pageUrl) {
 // Listen for verdict messages from content script
 chrome.runtime.onMessage.addListener((msg, sender) => {
   if (msg.type === 'archive-verdict') {
-    const clean = cleanUrl(msg.pageUrl);
+    const key = msg.snapshotKey;
+    if (!key) return;
     if (msg.verdict === 'good') {
-      archiveVerified.add(clean);
-      // Store locally
+      archiveVerified.add(key);
       chrome.storage.local.get({ localVerified: [], localBlocked: [] }, data => {
-        if (!data.localVerified.includes(clean)) {
-          data.localVerified.push(clean);
+        if (!data.localVerified.includes(key)) {
+          data.localVerified.push(key);
           chrome.storage.local.set({ localVerified: data.localVerified });
         }
       });
     } else {
-      archiveBlocklist.add(clean);
+      archiveBlocklist.add(key);
       chrome.storage.local.get({ localVerified: [], localBlocked: [] }, data => {
-        if (!data.localBlocked.includes(clean)) {
-          data.localBlocked.push(clean);
+        if (!data.localBlocked.includes(key)) {
+          data.localBlocked.push(key);
           chrome.storage.local.set({ localBlocked: data.localBlocked });
         }
       });

@@ -240,11 +240,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         }
 
         // Check archive.ph availability from background (no CORS issues)
-        checkArchive(tab.url).then(archiveUrl => {
+        checkArchive(tab.url).then(archiveData => {
           // Show badge with archive info
           chrome.scripting.executeScript({
             target: { tabId },
-            func: (names, archiveUrl) => {
+            func: (names, archiveData) => {
               if (document.getElementById('gremlin-badge')) return;
               const badge = document.createElement('div');
               badge.id = 'gremlin-badge';
@@ -257,15 +257,35 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
                 panel.id = 'gremlin-info';
                 let html = '<div style="margin-bottom:6px;font-weight:bold;color:#2d8a4e">Page Gremlin</div>'
                   + '<div style="margin-bottom:8px">' + names + '</div>';
-                if (archiveUrl) {
-                  html += '<a href="' + archiveUrl + '" target="_blank" style="color:#2d8a4e;text-decoration:underline;font-size:11px">Bekijk op archive.ph</a>';
+                if (archiveData) {
+                  const icon = archiveData.verified ? ' &#10003;' : '';
+                  html += '<a href="' + archiveData.url + '" target="_blank" style="color:#2d8a4e;text-decoration:underline;font-size:12px">'
+                    + 'archive.ph' + icon + '</a>';
+                  if (!archiveData.verified) {
+                    html += '<div style="margin-top:8px;font-size:11px;color:#666">Was the full article visible?</div>'
+                      + '<div style="margin-top:4px;display:flex;gap:6px">'
+                      + '<button id="gremlin-vote-yes" style="background:#2d8a4e;color:#fff;border:none;border-radius:3px;padding:3px 10px;cursor:pointer;font-size:11px">Yes</button>'
+                      + '<button id="gremlin-vote-no" style="background:#8a2d2d;color:#fff;border:none;border-radius:3px;padding:3px 10px;cursor:pointer;font-size:11px">No</button>'
+                      + '</div>';
+                  }
                 }
                 panel.innerHTML = html;
                 badge.appendChild(panel);
+                // Vote handlers
+                const voteYes = document.getElementById('gremlin-vote-yes');
+                const voteNo = document.getElementById('gremlin-vote-no');
+                if (voteYes) voteYes.addEventListener('click', () => {
+                  chrome.runtime.sendMessage({ type: 'archive-verdict', pageUrl: location.href, verdict: 'good' });
+                  panel.innerHTML = '<div style="color:#2d8a4e;font-size:12px">Thanks! Marked as complete.</div>';
+                });
+                if (voteNo) voteNo.addEventListener('click', () => {
+                  chrome.runtime.sendMessage({ type: 'archive-verdict', pageUrl: location.href, verdict: 'bad' });
+                  panel.innerHTML = '<div style="color:#8a2d2d;font-size:12px">Thanks! This link won't be shown again.</div>';
+                });
               });
               document.body.appendChild(badge);
             },
-            args: [names, archiveUrl],
+            args: [names, archiveData],
             world: 'MAIN'
           }).catch(() => {});
         });
@@ -284,33 +304,76 @@ function cleanUrl(url) {
   }
 }
 
-// Check if archive.ph has this URL with actual content (not just a paywalled snapshot)
+// Fetch blocklist and verified list from GitHub repo
+let archiveBlocklist = new Set();
+let archiveVerified = new Set();
+let listsLoaded = false;
+
+async function loadArchiveLists(repo) {
+  if (listsLoaded) return;
+  try {
+    const base = `https://raw.githubusercontent.com/${repo}/main/`;
+    const [blockRes, verRes] = await Promise.all([
+      fetch(base + 'blocklist.json').catch(() => null),
+      fetch(base + 'verified.json').catch(() => null)
+    ]);
+    if (blockRes?.ok) archiveBlocklist = new Set(await blockRes.json());
+    if (verRes?.ok) archiveVerified = new Set(await verRes.json());
+    listsLoaded = true;
+  } catch {}
+}
+
+// Check if archive.ph has this URL
 async function checkArchive(pageUrl) {
   try {
-    const checkUrl = 'https://archive.ph/newest/' + cleanUrl(pageUrl);
-    const res = await fetch(checkUrl, { redirect: 'follow' });
+    const clean = cleanUrl(pageUrl);
+
+    // Load community lists
+    const { repoUrl } = await chrome.storage.local.get({ repoUrl: 'varanus-salvator/page-gremlin' });
+    await loadArchiveLists(repoUrl);
+
+    // Skip if community-blocked
+    if (archiveBlocklist.has(clean)) return null;
+
+    // Check if already verified
+    const isVerified = archiveVerified.has(clean);
+
+    const checkUrl = 'https://archive.ph/newest/' + clean;
+    const res = await fetch(checkUrl, { method: 'HEAD', redirect: 'follow' });
     const finalUrl = res.url;
-    // Must be an actual archived page (has timestamp in URL)
     if (!res.ok || !finalUrl.match(/archive\.ph\/\d{14}\//)) {
       return null;
     }
-    // Fetch the content and check if there's enough article text
-    const html = await res.text();
-    // Strip all tags, then check text length
-    const text = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-                     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-                     .replace(/<[^>]+>/g, ' ')
-                     .replace(/\s+/g, ' ');
-    // A proper article should have at least 1500 chars of text content
-    // (a paywalled snapshot typically has < 500 of actual article text)
-    if (text.length > 3000) {
-      return finalUrl;
-    }
-    return null;
+    return { url: finalUrl, verified: isVerified };
   } catch {
     return null;
   }
 }
+
+// Listen for verdict messages from content script
+chrome.runtime.onMessage.addListener((msg, sender) => {
+  if (msg.type === 'archive-verdict') {
+    const clean = cleanUrl(msg.pageUrl);
+    if (msg.verdict === 'good') {
+      archiveVerified.add(clean);
+      // Store locally
+      chrome.storage.local.get({ localVerified: [], localBlocked: [] }, data => {
+        if (!data.localVerified.includes(clean)) {
+          data.localVerified.push(clean);
+          chrome.storage.local.set({ localVerified: data.localVerified });
+        }
+      });
+    } else {
+      archiveBlocklist.add(clean);
+      chrome.storage.local.get({ localVerified: [], localBlocked: [] }, data => {
+        if (!data.localBlocked.includes(clean)) {
+          data.localBlocked.push(clean);
+          chrome.storage.local.set({ localBlocked: data.localBlocked });
+        }
+      });
+    }
+  }
+});
 
 function matchDomain(url, domain) {
   try {

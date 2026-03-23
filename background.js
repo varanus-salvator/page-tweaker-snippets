@@ -345,16 +345,78 @@ async function checkArchive(pageUrl) {
       const finalUrl = res.url;
       if (!res.ok || !finalUrl.match(/archive\.ph\/\d{14}\//)) continue;
 
-      // Extract the short ID (archive.ph/XXXXX)
       const shortMatch = finalUrl.match(/archive\.ph\/(\d{14})\//);
       const snapshotKey = shortMatch ? shortMatch[1] + '/' + clean : finalUrl;
 
       if (archiveBlocklist.has(snapshotKey)) continue;
-      const isVerified = archiveVerified.has(snapshotKey);
 
-      return { url: finalUrl, verified: isVerified, key: snapshotKey };
+      // Already verified? Return immediately
+      if (archiveVerified.has(snapshotKey)) {
+        return { url: finalUrl, verified: true, key: snapshotKey };
+      }
+
+      // Use Haiku to check if the page has real content
+      const verdict = await aiVerify(finalUrl, snapshotKey);
+      if (verdict === 'good') {
+        return { url: finalUrl, verified: true, key: snapshotKey };
+      } else if (verdict === 'bad') {
+        continue; // Try next strategy
+      }
+
+      // No API key or error — return unverified, let user vote
+      return { url: finalUrl, verified: false, key: snapshotKey };
     }
     return null;
+  } catch {
+    return null;
+  }
+}
+
+// Paywall keywords in multiple languages
+const PAYWALL_WORDS = [
+  'subscribe', 'subscription', 'sign in to read', 'log in to continue',
+  'premium article', 'exclusive content', 'create an account',
+  'abonneer', 'abonnement', 'inloggen om verder te lezen', 'plus artikel',
+  'registreer', 'wordt abonnee', 'lees het hele artikel'
+];
+
+// Verify if an archive.ph page has real content (no AI, just heuristics)
+async function aiVerify(archiveUrl, snapshotKey) {
+  try {
+    const res = await fetch(archiveUrl);
+    if (!res.ok) return null;
+    const html = await res.text();
+
+    // Extract paragraph text only (most article content is in <p> tags)
+    const paragraphs = html.match(/<p[^>]*>([^<]{40,})<\/p>/gi) || [];
+    const articleText = paragraphs
+      .map(p => p.replace(/<[^>]+>/g, '').trim())
+      .join(' ');
+
+    // Check for paywall indicators
+    const lowerHtml = html.toLowerCase();
+    const paywallHits = PAYWALL_WORDS.filter(w => lowerHtml.includes(w)).length;
+
+    // Verdict: enough article text AND not too many paywall signals
+    const hasContent = articleText.length > 1500;
+    const isPaywalled = paywallHits >= 3;
+
+    let verdict;
+    if (hasContent && !isPaywalled) verdict = 'good';
+    else if (!hasContent || isPaywalled) verdict = 'bad';
+    else return null;
+
+    // Cache locally
+    const listKey = verdict === 'good' ? 'localVerified' : 'localBlocked';
+    const targetSet = verdict === 'good' ? archiveVerified : archiveBlocklist;
+    targetSet.add(snapshotKey);
+    chrome.storage.local.get({ [listKey]: [] }, d => {
+      if (!d[listKey].includes(snapshotKey)) {
+        d[listKey].push(snapshotKey);
+        chrome.storage.local.set({ [listKey]: d[listKey] });
+      }
+    });
+    return verdict;
   } catch {
     return null;
   }

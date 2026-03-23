@@ -1,33 +1,41 @@
 [
   {
-    "id": "parool-paywall",
-    "name": "Parool — paywall verwijderen",
+    "id": "parool-reader",
+    "name": "Parool — reader view",
     "domain": "parool.nl",
-    "description": "Verwijdert de DPG Media paywall overlay en maakt artikeltekst zichtbaar",
-    "js": "tweaker.remove('[data-temptation-position]', '.tm-ui', '._vis_hide_layer', '[id^=\"_vis_opt\"]'); tweaker.reveal('[id=\"article-content\"]');",
-    "css": "body { overflow: auto !important; } .paywall, .temptation { display: none !important; }"
+    "description": "Rendert artikelen in een schone leesweergave vanuit JSON-LD data",
+    "js": "tweaker.reader();",
+    "css": ""
   },
   {
-    "id": "volkskrant-paywall",
-    "name": "Volkskrant — paywall verwijderen",
+    "id": "volkskrant-reader",
+    "name": "Volkskrant — reader view",
     "domain": "volkskrant.nl",
-    "description": "Verwijdert de DPG Media paywall overlay en maakt artikeltekst zichtbaar",
-    "js": "tweaker.remove('[data-temptation-position]', '.tm-ui', '._vis_hide_layer', '[id^=\"_vis_opt\"]'); tweaker.reveal('[id=\"article-content\"]');",
-    "css": "body { overflow: auto !important; } .paywall, .temptation { display: none !important; }"
+    "description": "Rendert artikelen in een schone leesweergave vanuit JSON-LD data",
+    "js": "tweaker.reader();",
+    "css": ""
   },
   {
-    "id": "trouw-paywall",
-    "name": "Trouw — paywall verwijderen",
+    "id": "trouw-reader",
+    "name": "Trouw — reader view",
     "domain": "trouw.nl",
-    "description": "Verwijdert de DPG Media paywall overlay en maakt artikeltekst zichtbaar",
-    "js": "tweaker.remove('[data-temptation-position]', '.tm-ui', '._vis_hide_layer', '[id^=\"_vis_opt\"]'); tweaker.reveal('[id=\"article-content\"]');",
-    "css": "body { overflow: auto !important; } .paywall, .temptation { display: none !important; }"
+    "description": "Rendert artikelen in een schone leesweergave vanuit JSON-LD data",
+    "js": "tweaker.reader();",
+    "css": ""
   },
   {
-    "id": "ad-paywall",
-    "name": "AD — paywall verwijderen",
+    "id": "ad-reader",
+    "name": "AD — reader view",
     "domain": "ad.nl",
-    "description": "Verwijdert de DPG Media paywall overlay en maakt artikeltekst zichtbaar",
+    "description": "Rendert artikelen in een schone leesweergave vanuit JSON-LD data",
+    "js": "tweaker.reader();",
+    "css": ""
+  },
+  {
+    "id": "dpg-paywall",
+    "name": "DPG Media — paywall verwijderen",
+    "domain": "parool.nl",
+    "description": "Alternatief: verwijdert overlay zonder reader view (werkt ook voor volkskrant.nl, trouw.nl, ad.nl)",
     "js": "tweaker.remove('[data-temptation-position]', '.tm-ui', '._vis_hide_layer', '[id^=\"_vis_opt\"]'); tweaker.reveal('[id=\"article-content\"]');",
     "css": "body { overflow: auto !important; } .paywall, .temptation { display: none !important; }"
   }

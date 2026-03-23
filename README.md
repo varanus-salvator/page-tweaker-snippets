@@ -46,6 +46,26 @@ const meta = tweaker.meta();
 tweaker.log(meta['og:title'], meta['og:description']);
 ```
 
+### Reader view
+
+Instead of manipulating the DOM to remove paywalls, you can render a clean reading view directly from the JSON-LD data. This is more robust since it doesn't depend on the site's CSS or DOM structure.
+
+| Method | Description |
+|--------|-------------|
+| `tweaker.reader()` | Auto-detect article/recipe and render reader view |
+| `tweaker.reader("article")` | Render article reader view from JSON-LD |
+| `tweaker.reader("recipe")` | Render recipe reader view from JSON-LD |
+
+```js
+// One-liner: replace the entire page with a clean reader view
+tweaker.reader();
+
+// Force recipe mode
+tweaker.reader('recipe');
+```
+
+The reader view extracts everything from JSON-LD (title, author, date, body text, images, ingredients, instructions) and renders it in a clean, minimal layout. No DOM hacking needed.
+
 ### DOM manipulation
 
 | Method | Description |

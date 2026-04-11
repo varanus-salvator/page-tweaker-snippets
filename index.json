@@ -33,11 +33,11 @@
   },
   {
     "id": "nytimes-nags",
-    "name": "NYTimes — artikelen in reader view",
+    "name": "NYTimes — paywall omzeilen",
     "domain": "nytimes.com",
-    "description": "Op artikelpagina's: render schone reader view vanuit JSON-LD (omzeilt paywall). Op andere pagina's: verberg alleen nag banners.",
-    "js": "if (location.pathname.match(/\\/\\d{4}\\/\\d{2}\\/\\d{2}\\//)) { gremlin.reader('article'); }",
-    "css": "#dock-container, [data-testid='inline-message'], [data-testid='paywall'], [data-testid='subscription-nag'], [data-testid='dock-bar-wrapper'], [class*='subscriber-nag'], [class*='expanded-dock'], [class*='pz-ad-box'] { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; } body { overflow: auto !important; }"
+    "description": "Verbergt gateway overlay en toont volledige article body (tekst zit in DOM voor SEO)",
+    "js": "",
+    "css": "#gateway-container, [data-testid='gateway-container'], #standalone-footer, #dock-container, [data-testid='inline-message'], [data-testid='paywall'], [data-testid='subscription-nag'], [data-testid='dock-bar-wrapper'], [class*='subscriber-nag'], [class*='expanded-dock'] { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; } body, html { overflow: auto !important; position: static !important; } section[name='articleBody'], article[id='story'], [name='articleBody'] { max-height: none !important; overflow: visible !important; -webkit-mask-image: none !important; mask-image: none !important; opacity: 1 !important; height: auto !important; } section[name='articleBody'] > *, article[id='story'] > * { display: block !important; visibility: visible !important; opacity: 1 !important; }"
   },
   {
     "id": "telegraaf",

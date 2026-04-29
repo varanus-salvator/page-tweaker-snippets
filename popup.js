@@ -34,10 +34,12 @@ function render() {
     return;
   }
 
-  list.innerHTML = tweaks.map((t, i) => `
+  list.innerHTML = tweaks.map((t, i) => {
+    const domainStr = Array.isArray(t.domains) ? t.domains.join(', ') : (t.domain || '');
+    return `
     <div class="tweak ${t.enabled ? '' : 'disabled'}" data-i="${i}">
       <div class="tweak-header">
-        <input type="text" class="domain" value="${esc(t.domain)}" placeholder="parool.nl">
+        <input type="text" class="domain" value="${esc(domainStr)}" placeholder="parool.nl, voorbeeld.com">
         <label><input type="checkbox" class="toggle" ${t.enabled ? 'checked' : ''}> aan</label>
       </div>
       ${t.name ? `<div class="label" style="color:#e94560;margin-top:0;margin-bottom:4px">${esc(t.name)}</div>` : ''}
@@ -49,12 +51,20 @@ function render() {
         <button class="danger del">Verwijder</button>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   list.querySelectorAll('.tweak').forEach(el => {
     const i = +el.dataset.i;
     el.querySelector('.domain').addEventListener('change', e => {
-      tweaks[i].domain = e.target.value.trim();
+      const v = e.target.value.trim();
+      if (v.includes(',')) {
+        tweaks[i].domains = v.split(',').map(s => s.trim()).filter(Boolean);
+        delete tweaks[i].domain;
+      } else {
+        tweaks[i].domain = v;
+        delete tweaks[i].domains;
+      }
       save();
     });
     el.querySelector('.toggle').addEventListener('change', e => {
@@ -138,15 +148,22 @@ function renderSnippets(filter = '') {
   }
 
   snippetList.innerHTML = filtered.map((s, i) => {
-    const installed = tweaks.some(t => t.id === s.id);
+    const installedTweak = tweaks.find(t => t.id === s.id);
+    const isInstalled = !!installedTweak;
+    const libVersion = s.version || 0;
+    const installedVersion = installedTweak?.version || 0;
+    const updateAvailable = isInstalled && libVersion > installedVersion;
+    const domainStr = Array.isArray(s.domains) ? s.domains.join(', ') : (s.domain || '');
+    let label, cls;
+    if (updateAvailable) { label = '↻ Update naar v' + libVersion; cls = ''; }
+    else if (isInstalled) { label = '&#10003; Geïnstalleerd' + (libVersion ? ' (v' + libVersion + ')' : ''); cls = 'secondary'; }
+    else { label = '+ Installeer' + (libVersion ? ' (v' + libVersion + ')' : ''); cls = ''; }
     return `
       <div class="snippet" data-i="${i}">
         <div class="snippet-name">${esc(s.name)}</div>
-        <div class="snippet-domain">${esc(s.domain)}</div>
+        <div class="snippet-domain">${esc(domainStr)}</div>
         <div class="snippet-desc">${esc(s.description || '')}</div>
-        <button class="install-snippet ${installed ? 'secondary' : ''}" data-id="${esc(s.id)}">
-          ${installed ? '&#10003; Geïnstalleerd' : '+ Installeer'}
-        </button>
+        <button class="install-snippet ${cls}" data-id="${esc(s.id)}">${label}</button>
       </div>
     `;
   }).join('');
@@ -159,14 +176,17 @@ function renderSnippets(filter = '') {
 
       // Remove existing with same id
       tweaks = tweaks.filter(t => t.id !== id);
-      tweaks.push({
+      const installed = {
         id: snippet.id,
         name: snippet.name,
-        domain: snippet.domain,
         js: snippet.js || '',
         css: snippet.css || '',
+        version: snippet.version || 0,
         enabled: true
-      });
+      };
+      if (Array.isArray(snippet.domains)) installed.domains = snippet.domains;
+      else installed.domain = snippet.domain;
+      tweaks.push(installed);
       save();
       renderSnippets(snippetSearch.value);
     });

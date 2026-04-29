@@ -5,7 +5,8 @@
     "domain": "parool.nl",
     "description": "Verbergt de DPG Media paywall overlay (zonder DOM-verwijdering) en toont artikeltekst",
     "js": "",
-    "css": "[data-temptation-position], .marketing-banner, .tm-ui, ._vis_hide_layer, [id^=\"_vis_opt\"], .tm, .tm--inline { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; pointer-events: none !important; } .paywall { display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; overflow: visible !important; max-height: none !important; } body { overflow: auto !important; }"
+    "css": "[data-temptation-position], .marketing-banner, .tm-ui, ._vis_hide_layer, [id^=\"_vis_opt\"], .tm, .tm--inline { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; pointer-events: none !important; } .paywall { display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; overflow: visible !important; max-height: none !important; } body { overflow: auto !important; }",
+    "version": 1
   },
   {
     "id": "volkskrant-paywall",
@@ -13,7 +14,8 @@
     "domain": "volkskrant.nl",
     "description": "Verbergt de DPG Media paywall overlay (zonder DOM-verwijdering) en toont artikeltekst",
     "js": "",
-    "css": "[data-temptation-position], .marketing-banner, .tm-ui, ._vis_hide_layer, [id^=\"_vis_opt\"], .tm, .tm--inline { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; pointer-events: none !important; } .paywall { display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; overflow: visible !important; max-height: none !important; } body { overflow: auto !important; }"
+    "css": "[data-temptation-position], .marketing-banner, .tm-ui, ._vis_hide_layer, [id^=\"_vis_opt\"], .tm, .tm--inline { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; pointer-events: none !important; } .paywall { display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; overflow: visible !important; max-height: none !important; } body { overflow: auto !important; }",
+    "version": 1
   },
   {
     "id": "trouw-paywall",
@@ -21,7 +23,8 @@
     "domain": "trouw.nl",
     "description": "Verbergt de DPG Media paywall overlay (zonder DOM-verwijdering) en toont artikeltekst",
     "js": "",
-    "css": "[data-temptation-position], .marketing-banner, .tm-ui, ._vis_hide_layer, [id^=\"_vis_opt\"], .tm, .tm--inline { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; pointer-events: none !important; } .paywall { display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; overflow: visible !important; max-height: none !important; } body { overflow: auto !important; }"
+    "css": "[data-temptation-position], .marketing-banner, .tm-ui, ._vis_hide_layer, [id^=\"_vis_opt\"], .tm, .tm--inline { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; pointer-events: none !important; } .paywall { display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; overflow: visible !important; max-height: none !important; } body { overflow: auto !important; }",
+    "version": 1
   },
   {
     "id": "ad-paywall",
@@ -29,7 +32,8 @@
     "domain": "ad.nl",
     "description": "Verbergt de DPG Media paywall overlay (zonder DOM-verwijdering) en toont artikeltekst",
     "js": "",
-    "css": "[data-temptation-position], .marketing-banner, .tm-ui, ._vis_hide_layer, [id^=\"_vis_opt\"], .tm, .tm--inline { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; pointer-events: none !important; } .paywall { display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; overflow: visible !important; max-height: none !important; } body { overflow: auto !important; }"
+    "css": "[data-temptation-position], .marketing-banner, .tm-ui, ._vis_hide_layer, [id^=\"_vis_opt\"], .tm, .tm--inline { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; pointer-events: none !important; } .paywall { display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; overflow: visible !important; max-height: none !important; } body { overflow: auto !important; }",
+    "version": 1
   },
   {
     "id": "nytimes-nags",
@@ -37,7 +41,8 @@
     "domain": "nytimes.com",
     "description": "Verbergt gateway overlay en toont volledige article body (tekst zit in DOM voor SEO)",
     "js": "",
-    "css": "#gateway-container, [data-testid='gateway-container'], #standalone-footer, #dock-container, [data-testid='inline-message'], [data-testid='paywall'], [data-testid='subscription-nag'], [data-testid='dock-bar-wrapper'], [class*='subscriber-nag'], [class*='expanded-dock'] { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; } body, html { overflow: auto !important; position: static !important; } section[name='articleBody'], article[id='story'], [name='articleBody'] { max-height: none !important; overflow: visible !important; -webkit-mask-image: none !important; mask-image: none !important; opacity: 1 !important; height: auto !important; } section[name='articleBody'] > *, article[id='story'] > * { display: block !important; visibility: visible !important; opacity: 1 !important; }"
+    "css": "#gateway-container, [data-testid='gateway-container'], #standalone-footer, #dock-container, [data-testid='inline-message'], [data-testid='paywall'], [data-testid='subscription-nag'], [data-testid='dock-bar-wrapper'], [class*='subscriber-nag'], [class*='expanded-dock'] { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; } body, html { overflow: auto !important; position: static !important; } section[name='articleBody'], article[id='story'], [name='articleBody'] { max-height: none !important; overflow: visible !important; -webkit-mask-image: none !important; mask-image: none !important; opacity: 1 !important; height: auto !important; } section[name='articleBody'] > *, article[id='story'] > * { display: block !important; visibility: visible !important; opacity: 1 !important; }",
+    "version": 1
   },
   {
     "id": "telegraaf",
@@ -45,7 +50,8 @@
     "domain": "telegraaf.nl",
     "description": "Content zit niet in de HTML. Gremlin badge toont link naar archive.ph als het artikel daar beschikbaar is.",
     "js": "",
-    "css": ""
+    "css": "",
+    "version": 1
   },
   {
     "id": "nrc",
@@ -53,7 +59,8 @@
     "domain": "nrc.nl",
     "description": "Gremlin badge toont link naar archive.ph als het artikel daar beschikbaar is.",
     "js": "",
-    "css": ""
+    "css": "",
+    "version": 1
   },
   {
     "id": "newyorker-reader",
@@ -61,6 +68,7 @@
     "domain": "newyorker.com",
     "description": "Rendert een schone reader view vanuit JSON-LD (volledige articleBody zit in de HTML voor SEO, omzeilt paywall)",
     "js": "if (location.pathname.match(/\\/(magazine|news|culture|books|humor|cartoons|podcast|video)\\//)) { gremlin.reader('article'); }",
-    "css": ""
+    "css": "",
+    "version": 1
   }
 ]

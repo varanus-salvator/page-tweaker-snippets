@@ -8,11 +8,21 @@
   h1 { font-size: 15px; margin-bottom: 10px; color: #4ade80; display: flex; align-items: center; gap: 8px; }
   h1 svg { width: 20px; height: 20px; }
 
-  .tweak { background: #132613; border: 1px solid #1a6b35; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
-  .tweak.disabled { opacity: 0.5; }
-  .tweak-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .tweak-header input[type="text"] { flex: 1; }
-  .tweak-header label { font-size: 11px; white-space: nowrap; cursor: pointer; }
+  .tweak { background: #132613; border: 1px solid #1a6b35; border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; }
+  .tweak.disabled { opacity: 0.45; }
+  .tweak-row { display: flex; align-items: center; gap: 8px; }
+  .tweak-title { flex: 1; min-width: 0; }
+  .tweak-name { font-weight: bold; color: #4ade80; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tweak-domain { font-size: 11px; color: #6a8a6a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tweak-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .tweak-toggle { font-size: 11px; cursor: pointer; user-select: none; }
+  .tweak-expand { background: none; border: none; color: #4ade80; cursor: pointer; padding: 2px 6px; font-size: 14px; }
+  .tweak-expand:hover { color: #6aee90; }
+  .tweak-del { background: none; border: none; color: #a44; cursor: pointer; padding: 2px 6px; font-size: 14px; }
+  .tweak-del:hover { color: #e66; }
+  .tweak-body { display: none; margin-top: 8px; padding-top: 8px; border-top: 1px solid #1a3a1a; }
+  .tweak.expanded .tweak-body { display: block; }
+  .tweak-body input[type="text"] { margin-bottom: 4px; }
 
   input[type="text"], textarea {
     background: #091309; border: 1px solid #1a6b35; color: #c0d8c0;
